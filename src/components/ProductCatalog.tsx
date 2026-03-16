@@ -196,7 +196,12 @@ const products: Product[] = [
 
 const categoryOptions = ['API', 'Impurity', 'Metabolite']
 
-export function ProductCatalog() {
+type ProductCatalogProps = {
+  showCount?: number
+  featured?: boolean
+}
+
+export function ProductCatalog({ showCount, featured }: ProductCatalogProps = {}) {
   const [search, setSearch] = useState('')
   const [inStockOnly, setInStockOnly] = useState(false)
   const [selectedCategories, setSelectedCategories] = useState<string[]>([])
@@ -216,6 +221,17 @@ export function ProductCatalog() {
       return matchesStock && matchesCategory && matchesSearch
     })
   }, [inStockOnly, search, selectedCategories])
+
+  const visibleProducts = useMemo(() => {
+    let list = filteredProducts
+    if (featured) {
+      list = list.filter((product) => product.category === 'API')
+    }
+    if (showCount && showCount > 0) {
+      list = list.slice(0, showCount)
+    }
+    return list
+  }, [filteredProducts, featured, showCount])
 
   const toggleCategory = (category: string) => {
     setSelectedCategories((prev) =>
@@ -301,19 +317,19 @@ placeholder="Search by Name, CAS, or Cat No."
               </p>
             </div>
             <p className="text-sm text-slate-500">
-              Showing <span className="font-semibold text-slate-900">{filteredProducts.length}</span> of{' '}
+              Showing <span className="font-semibold text-slate-900">{visibleProducts.length}</span> of{' '}
               <span className="font-semibold text-slate-900">{products.length}</span> products
             </p>
           </div>
 
           <div className="mt-8 grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
-            {filteredProducts.length === 0 ? (
+            {visibleProducts.length === 0 ? (
               <div className="col-span-full rounded-2xl border border-dashed border-slate-200 bg-white p-10 text-center">
                 <p className="text-sm font-medium text-slate-700">No products match your filters.</p>
                 <p className="mt-2 text-sm text-slate-500">Try adjusting search terms or category selections.</p>
               </div>
             ) : (
-              filteredProducts.map((product) => (
+              visibleProducts.map((product) => (
                 <article
                   key={product.id}
                   className="flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:shadow-xl"

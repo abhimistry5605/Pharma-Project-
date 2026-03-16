@@ -1,3 +1,5 @@
+import { useState } from 'react'
+import type { FormEvent } from 'react'
 import {
   FlaskConical,
   ShieldCheck,
@@ -9,6 +11,37 @@ import {
 } from 'lucide-react'
 
 export function AboutLab() {
+  const [formData, setFormData] = useState({
+    department: 'Sales',
+    name: '',
+    email: '',
+    phone: '',
+    location: 'India',
+    message: '',
+  })
+  const [formStatus, setFormStatus] = useState('')
+  const [formError, setFormError] = useState('')
+
+  const handleChange = (key: string, value: string) => {
+    setFormData((prev) => ({ ...prev, [key]: value }))
+  }
+
+  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    const { name, email, phone, location, message } = formData
+
+    if (!name.trim() || !email.trim() || !phone.trim() || !location.trim() || !message.trim()) {
+      setFormError('Please complete all fields before submitting.')
+      setFormStatus('')
+      return
+    }
+
+    // Normally this is where you would call an API; here we simulate success.
+    setFormError('')
+    setFormStatus('Thank you! Your inquiry has been received and will be followed up shortly.')
+    setFormData({ department: 'Sales', name: '', email: '', phone: '', location: 'India', message: '' })
+  }
+
   return (
     <section className="bg-white py-16">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -134,19 +167,26 @@ export function AboutLab() {
               Reach our team with your request and we’ll route it to the right department.
             </p>
 
-            <form className="mt-8 space-y-5">
+            <form className="mt-8 space-y-5" onSubmit={handleSubmit}>
               <label className="block text-sm font-medium text-slate-700">Department</label>
-              <select className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 focus:border-cyan-600 focus:outline-none focus:ring-2 focus:ring-cyan-200">
-                <option>Sales</option>
-                <option>Technical</option>
-                <option>Logistics</option>
+              <select
+                value={formData.department}
+                onChange={(e) => handleChange('department', e.target.value)}
+                className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 focus:border-cyan-600 focus:outline-none focus:ring-2 focus:ring-cyan-200"
+              >
+                <option value="Sales">Sales</option>
+                <option value="Technical">Technical</option>
+                <option value="Logistics">Logistics</option>
               </select>
 
               <div>
                 <label className="block text-sm font-medium text-slate-700">Name</label>
                 <input
+                  value={formData.name}
+                  onChange={(e) => handleChange('name', e.target.value)}
                   type="text"
                   placeholder="Jane Doe"
+                  required
                   className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 focus:border-cyan-600 focus:outline-none focus:ring-2 focus:ring-cyan-200"
                 />
               </div>
@@ -154,8 +194,35 @@ export function AboutLab() {
               <div>
                 <label className="block text-sm font-medium text-slate-700">Email</label>
                 <input
+                  value={formData.email}
+                  onChange={(e) => handleChange('email', e.target.value)}
                   type="email"
                   placeholder="jane@example.com"
+                  required
+                  className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 focus:border-cyan-600 focus:outline-none focus:ring-2 focus:ring-cyan-200"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-700">Phone (INR Number)</label>
+                <input
+                  value={formData.phone}
+                  onChange={(e) => handleChange('phone', e.target.value)}
+                  type="tel"
+                  placeholder="+91 98765 43210"
+                  required
+                  className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 focus:border-cyan-600 focus:outline-none focus:ring-2 focus:ring-cyan-200"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-700">Location</label>
+                <input
+                  value={formData.location}
+                  onChange={(e) => handleChange('location', e.target.value)}
+                  type="text"
+                  placeholder="India"
+                  required
                   className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 focus:border-cyan-600 focus:outline-none focus:ring-2 focus:ring-cyan-200"
                 />
               </div>
@@ -163,11 +230,17 @@ export function AboutLab() {
               <div>
                 <label className="block text-sm font-medium text-slate-700">Message</label>
                 <textarea
+                  value={formData.message}
+                  onChange={(e) => handleChange('message', e.target.value)}
                   rows={4}
                   placeholder="Tell us about your project or what you need..."
+                  required
                   className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 focus:border-cyan-600 focus:outline-none focus:ring-2 focus:ring-cyan-200"
                 />
               </div>
+
+              {formError && <p className="text-sm text-red-600">{formError}</p>}
+              {formStatus && <p className="text-sm text-green-600">{formStatus}</p>}
 
               <button
                 type="submit"
@@ -200,15 +273,15 @@ export function AboutLab() {
               <div className="flex items-start gap-3">
                 <Phone className="mt-1 h-5 w-5 text-cyan-600" />
                 <div>
-                  <p className="text-sm font-medium text-slate-900">Phone</p>
-                  <p className="text-sm text-slate-600">+1 (555) 123-4567</p>
+                  <p className="text-sm font-medium text-slate-900">Phone (India)</p>
+                  <p className="text-sm text-slate-600">+91 98765 43210</p>
                 </div>
               </div>
               <div className="flex items-start gap-3">
                 <Mail className="mt-1 h-5 w-5 text-cyan-600" />
                 <div>
                   <p className="text-sm font-medium text-slate-900">Email</p>
-              <p className="text-sm text-slate-600">sales@medicorepharma.com</p>
+                  <p className="text-sm text-slate-600">sales@medicorepharma.com</p>
                 </div>
               </div>
             </div>

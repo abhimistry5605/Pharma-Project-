@@ -100,13 +100,28 @@ placeholder="Search by Name, CAS, or Cat No."
                 })}
               </div>
             </div>
+
+            <div className="mt-8 grid gap-4 sm:grid-cols-3">
+              {categoryCards.map((card) => {
+                const Icon = card.icon
+                return (
+                  <div key={card.title} className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+                    <div className="flex items-center gap-2 text-cyan-600">
+                      <Icon className="h-5 w-5" />
+                      <h5 className="text-sm font-semibold text-slate-900">{card.title}</h5>
+                    </div>
+                    <p className="mt-2 text-sm text-slate-600">{card.description}</p>
+                  </div>
+                )
+              })}
+            </div>
           </div>
 
 <div className="relative h-80 flex items-center justify-center rounded-3xl bg-gradient-to-br from-slate-100 via-slate-200 to-slate-300 shadow-2xl sm:h-[520px] border-4 border-white p-8">
-            <img 
-              src="https://images.unsplash.com/photo-1589754006499-8c4bb7e2d3e5?w=400&amp;auto=format&amp;fit=crop" 
-              alt="MediCore pharma logo - clean tech molecular design" 
-              className="max-h-64 max-w-64 object-contain drop-shadow-2xl"
+            <img
+              src={heroImageUrl}
+              alt="Pharmaceutical laboratory research with instruments and digital dashboard"
+              className="h-full w-full object-cover rounded-2xl"
             />
             <div className="absolute inset-0 bg-gradient-to-r from-slate-900/20 via-transparent to-slate-900/20" />
           </div>
