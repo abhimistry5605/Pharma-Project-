@@ -194,7 +194,7 @@ const products: Product[] = [
   },
 ]
 
-const categoryOptions = ['API', 'Impurity', 'Metabolite']
+const categoryOptions = ['API', 'Impurity', 'Metabolite', 'Nitrosamine']
 
 type ProductCatalogProps = {
   showCount?: number
@@ -202,20 +202,21 @@ type ProductCatalogProps = {
 }
 
 export function ProductCatalog({ showCount, featured }: ProductCatalogProps = {}) {
-  const [search, setSearch] = useState('')
+  const [query, setQuery] = useState('')
   const [inStockOnly, setInStockOnly] = useState(false)
   const [selectedCategories, setSelectedCategories] = useState<string[]>([])
   const [sortBy, setSortBy] = useState<'relevance' | 'name' | 'stock'>('relevance')
+  const [showAll, setShowAll] = useState(false)
 
   const clearFilters = () => {
-    setSearch('')
+    setQuery('')
     setInStockOnly(false)
     setSelectedCategories([])
     setSortBy('relevance')
   }
 
   const filteredProducts = useMemo(() => {
-    const term = search.trim().toLowerCase()
+    const term = query.trim().toLowerCase()
     return products.filter((product) => {
       const matchesStock = !inStockOnly || product.inStock
       const matchesCategory =
@@ -228,7 +229,7 @@ export function ProductCatalog({ showCount, featured }: ProductCatalogProps = {}
 
       return matchesStock && matchesCategory && matchesSearch
     })
-  }, [inStockOnly, search, selectedCategories])
+  }, [inStockOnly, query, selectedCategories])
 
   const visibleProducts = useMemo(() => {
     let list = filteredProducts
@@ -242,11 +243,19 @@ export function ProductCatalog({ showCount, featured }: ProductCatalogProps = {}
       list = [...list].sort((a, b) => Number(b.inStock) - Number(a.inStock))
     }
 
-    if (showCount && showCount > 0) {
-      list = list.slice(0, showCount)
+    if (showAll) {
+      return list
     }
-    return list
-  }, [filteredProducts, featured, showCount, sortBy])
+
+    if (showCount && showCount > 0) {
+      return list.slice(0, showCount)
+    }
+
+    return list.slice(0, 4)
+  }, [filteredProducts, featured, showAll, sortBy, showCount])
+
+  const totalProducts = featured ? products.filter((p) => p.category === 'API').length : products.length
+
 
   const toggleCategory = (category: string) => {
     setSelectedCategories((prev) =>
@@ -269,9 +278,9 @@ export function ProductCatalog({ showCount, featured }: ProductCatalogProps = {}
                 Refinement Search
               </label>
               <input
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-placeholder="Search by Name, CAS, or Cat No."
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Search by Cat No, CAS, or Name..."
                 className="mt-3 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-cyan-600 focus:outline-none focus:ring-2 focus:ring-cyan-200"
               />
             </div>
@@ -324,6 +333,29 @@ placeholder="Search by Name, CAS, or Cat No."
         </aside>
 
         <main className="flex-1">
+          {showAll && (
+            <div className="sticky top-0 z-30 w-full border-b border-slate-200 bg-white/95 py-4 backdrop-blur-md">
+              <div className="mx-auto flex max-w-7xl flex-col gap-3 px-4 sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-8">
+                <div className="flex flex-1 items-center gap-3">
+                  <Search className="h-5 w-5 text-slate-500" />
+                  <input
+                    value={query}
+                    onChange={(e) => setQuery(e.target.value)}
+                    placeholder="Search by Cat No, CAS, or Name..."
+                    className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm text-slate-900 focus:border-cyan-600 focus:outline-none focus:ring-2 focus:ring-cyan-200"
+                  />
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setShowAll(false)}
+                  className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50"
+                >
+                  Collapse Preview
+                </button>
+              </div>
+            </div>
+          )}
+
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <h2 className="text-2xl font-bold text-slate-900">Product Catalog</h2>
@@ -353,9 +385,8 @@ placeholder="Search by Name, CAS, or Cat No."
           </div>
           <p className="text-sm text-slate-500 mt-1">
             Showing <span className="font-semibold text-slate-900">{visibleProducts.length}</span> of{' '}
-            <span className="font-semibold text-slate-900">{products.length}</span> products
+            <span className="font-semibold text-slate-900">{totalProducts}</span> products
           </p>
-
           <div className="mt-8 grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
             {visibleProducts.length === 0 ? (
               <div className="col-span-full rounded-2xl border border-dashed border-slate-200 bg-white p-10 text-center">
@@ -425,6 +456,18 @@ placeholder="Search by Name, CAS, or Cat No."
               ))
             )}
           </div>
+
+          {!showAll && (
+            <div className="mt-8 text-center">
+              <button
+                type="button"
+                onClick={() => setShowAll(true)}
+                className="inline-flex items-center justify-center rounded-xl bg-cyan-600 px-8 py-3 text-sm font-semibold text-white shadow-lg hover:bg-cyan-700"
+              >
+                View All 20+ Reference Standards
+              </button>
+            </div>
+          )}
         </main>
       </div>
     </section>
