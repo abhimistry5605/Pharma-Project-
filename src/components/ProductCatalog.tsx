@@ -205,6 +205,14 @@ export function ProductCatalog({ showCount, featured }: ProductCatalogProps = {}
   const [search, setSearch] = useState('')
   const [inStockOnly, setInStockOnly] = useState(false)
   const [selectedCategories, setSelectedCategories] = useState<string[]>([])
+  const [sortBy, setSortBy] = useState<'relevance' | 'name' | 'stock'>('relevance')
+
+  const clearFilters = () => {
+    setSearch('')
+    setInStockOnly(false)
+    setSelectedCategories([])
+    setSortBy('relevance')
+  }
 
   const filteredProducts = useMemo(() => {
     const term = search.trim().toLowerCase()
@@ -227,11 +235,18 @@ export function ProductCatalog({ showCount, featured }: ProductCatalogProps = {}
     if (featured) {
       list = list.filter((product) => product.category === 'API')
     }
+
+    if (sortBy === 'name') {
+      list = [...list].sort((a, b) => a.name.localeCompare(b.name))
+    } else if (sortBy === 'stock') {
+      list = [...list].sort((a, b) => Number(b.inStock) - Number(a.inStock))
+    }
+
     if (showCount && showCount > 0) {
       list = list.slice(0, showCount)
     }
     return list
-  }, [filteredProducts, featured, showCount])
+  }, [filteredProducts, featured, showCount, sortBy])
 
   const toggleCategory = (category: string) => {
     setSelectedCategories((prev) =>
@@ -316,11 +331,30 @@ placeholder="Search by Name, CAS, or Cat No."
                 Browse quality reference standards and select the materials you need.
               </p>
             </div>
-            <p className="text-sm text-slate-500">
-              Showing <span className="font-semibold text-slate-900">{visibleProducts.length}</span> of{' '}
-              <span className="font-semibold text-slate-900">{products.length}</span> products
-            </p>
+            <div className="flex flex-wrap items-center gap-2">
+              <label className="text-sm text-slate-600">Sort by:</label>
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value as 'relevance' | 'name' | 'stock')}
+                className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 focus:border-cyan-500 focus:outline-none focus:ring-2 focus:ring-cyan-200"
+              >
+                <option value="relevance">Relevance</option>
+                <option value="name">Name (A-Z)</option>
+                <option value="stock">In Stock First</option>
+              </select>
+              <button
+                type="button"
+                onClick={clearFilters}
+                className="rounded-lg border border-slate-300 bg-slate-100 px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-200"
+              >
+                Clear filters
+              </button>
+            </div>
           </div>
+          <p className="text-sm text-slate-500 mt-1">
+            Showing <span className="font-semibold text-slate-900">{visibleProducts.length}</span> of{' '}
+            <span className="font-semibold text-slate-900">{products.length}</span> products
+          </p>
 
           <div className="mt-8 grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
             {visibleProducts.length === 0 ? (
@@ -332,14 +366,15 @@ placeholder="Search by Name, CAS, or Cat No."
               visibleProducts.map((product) => (
                 <article
                   key={product.id}
-                  className="flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:shadow-xl"
+                  className="group flex flex-col overflow-hidden rounded-3xl border border-white/30 bg-white/70 shadow-lg backdrop-blur-sm transition duration-300 hover:-translate-y-1 hover:shadow-2xl"
                 >
-                  <div className="h-48 bg-slate-100">
+                  <div className="relative h-48 overflow-hidden bg-slate-100">
                     <img
                       src={product.imageUrl}
                       alt={product.name}
-                      className="h-full w-full object-cover"
+                      className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
                     />
+                    <div className="absolute inset-0 bg-slate-900/10 transition-opacity duration-300 group-hover:bg-slate-900/25" />
                   </div>
                   <div className="flex flex-1 flex-col gap-4 p-5">
                     <div>
@@ -373,11 +408,16 @@ placeholder="Search by Name, CAS, or Cat No."
                     </div>
 
                     <div className="mt-auto">
-                      <button
+                              <button
                         type="button"
-                        className="w-full rounded-xl bg-cyan-600 px-4 py-3 text-sm font-semibold text-white shadow-sm hover:bg-cyan-700 transition-all"
+                        disabled={!product.inStock}
+                        className={`w-full rounded-xl px-4 py-3 text-sm font-semibold shadow-sm transition-all ${
+                          product.inStock
+                            ? 'bg-cyan-600 text-white hover:bg-cyan-700'
+                            : 'bg-slate-200 text-slate-400 cursor-not-allowed'
+                        }`}
                       >
-                        View Details
+                        {product.inStock ? 'Request Quote' : 'Out of stock'}
                       </button>
                     </div>
                   </div>
