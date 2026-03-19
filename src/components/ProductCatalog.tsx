@@ -397,38 +397,37 @@ export function ProductCatalog({ showCount, featured }: ProductCatalogProps = {}
               visibleProducts.map((product) => (
                 <article
                   key={product.id}
-                  className="grid w-full grid-cols-1 gap-2 rounded-xl border border-slate-200 bg-white p-4 shadow-sm transition hover:shadow-lg sm:grid-cols-[auto_1fr_auto] sm:items-center"
+                  className="grid w-full grid-cols-1 gap-1 rounded-xl border border-slate-200 bg-white p-4 shadow-sm transition hover:shadow-lg"
                 >
                   <div className="flex h-14 w-14 items-center justify-center rounded-lg border border-slate-200 bg-slate-50">
                     <img src={product.imageUrl} alt={product.name} className="h-10 w-10 object-contain" />
                   </div>
 
-                  <div className="min-w-0">
+                  <div className="min-w-0 space-y-1">
                     <h3 className="text-base font-bold text-slate-900 truncate">{product.name}</h3>
-                    <div className="mt-1 space-y-1 text-xs text-slate-600">
-                      <p className="truncate max-w-full">Cat No {product.catNo}</p>
-                      <p className="truncate max-w-full">CAS {product.casNo}</p>
-                    </div>
-                    <div className="mt-2 flex flex-wrap items-center gap-2 text-xs">
-                      <span className="rounded-full border border-slate-200 bg-slate-50 px-2 py-1 text-slate-700">{product.category}</span>
-                      <span
-                        className={`inline-flex items-center gap-1 rounded-full border px-2 py-1 font-semibold ${
-                          product.inStock
-                            ? 'border-emerald-100 bg-emerald-50 text-emerald-700'
-                            : 'border-amber-100 bg-amber-50 text-amber-700'
-                        }`}
-                      >
-                        <span className="h-2 w-2 rounded-full bg-current" />
-                        {product.inStock ? 'In stock' : 'Out of stock'}
-                      </span>
-                    </div>
+                    <p className="text-sm font-medium text-slate-600 truncate">Cat No {product.catNo}</p>
+                    <p className="text-sm text-slate-600 truncate">CAS {product.casNo}</p>
                   </div>
 
-                  <div className="flex items-center justify-end pt-2 sm:pt-0">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <span className="rounded-full border border-slate-200 bg-slate-50 px-2 py-1 text-xs text-slate-700">{product.category}</span>
+                    <span
+                      className={`inline-flex items-center gap-1 rounded-full border px-2 py-1 text-xs font-semibold ${
+                        product.inStock
+                          ? 'border-emerald-100 bg-emerald-50 text-emerald-700'
+                          : 'border-amber-100 bg-amber-50 text-amber-700'
+                      }`}
+                    >
+                      <span className="h-2 w-2 rounded-full bg-current" />
+                      {product.inStock ? 'In stock' : 'Out of stock'}
+                    </span>
+                  </div>
+
+                  <div className="pt-1">
                     <button
                       type="button"
                       disabled={!product.inStock}
-                      className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition ${
+                      className={`w-full rounded-lg px-3 py-1.5 text-xs font-semibold transition ${
                         product.inStock
                           ? 'bg-cyan-600 text-white hover:bg-cyan-700'
                           : 'bg-slate-200 text-slate-500 cursor-not-allowed'
