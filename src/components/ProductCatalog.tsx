@@ -397,9 +397,9 @@ export function ProductCatalog({ showCount, featured }: ProductCatalogProps = {}
               visibleProducts.map((product) => (
                 <article
                   key={product.id}
-                  className="flex items-center gap-4 rounded-lg border border-slate-200 bg-white p-4 shadow-sm transition hover:shadow-lg"
+                  className="flex flex-wrap items-center gap-4 rounded-lg border border-slate-200 bg-white p-4 shadow-sm transition hover:shadow-lg"
                 >
-                  <div className="flex h-20 w-20 items-center justify-center rounded-lg border border-slate-200 bg-slate-50">
+                  <div className="flex h-20 w-20 flex-none items-center justify-center rounded-lg border border-slate-200 bg-slate-50">
                     <img
                       src={product.imageUrl}
                       alt={product.name}
@@ -407,33 +407,32 @@ export function ProductCatalog({ showCount, featured }: ProductCatalogProps = {}
                     />
                   </div>
 
-                  <div className="flex flex-1 flex-wrap items-center gap-4">
-                    <div className="min-w-[240px]">
-                      <h3 className="text-base font-semibold text-slate-900">{product.name}</h3>
-                      <div className="mt-1 flex flex-wrap gap-3 text-sm text-slate-600">
-                        <span className="rounded-lg border border-slate-200 bg-slate-50 px-2 py-1">Cat No {product.catNo}</span>
-                        <span className="rounded-lg border border-slate-200 bg-slate-50 px-2 py-1">CAS {product.casNo}</span>
-                      </div>
+                  <div className="min-w-0 flex-1">
+                    <h3 className="text-base font-semibold text-slate-900 truncate">{product.name}</h3>
+                    <div className="mt-1 flex flex-wrap gap-2 text-sm text-slate-600">
+                      <span className="rounded-lg border border-slate-200 bg-slate-50 px-2 py-1">Cat No {product.catNo}</span>
+                      <span className="rounded-lg border border-slate-200 bg-slate-50 px-2 py-1">CAS {product.casNo}</span>
                     </div>
-
-                    <div className="flex items-center gap-2 text-sm">
-                      <span className="rounded-full px-2 py-1 text-xs font-semibold text-slate-700 border border-slate-200 bg-white">
-                        {product.category}
-                      </span>
+                    <div className="mt-2 flex flex-wrap items-center gap-2 text-xs">
+                      <span className="rounded-full border border-slate-200 bg-slate-50 px-2 py-1 text-slate-700">{product.category}</span>
                       <span
-                        className={`inline-flex items-center gap-1 rounded-full px-2 py-1 text-xs font-semibold ${
-                          product.inStock ? 'bg-emerald-50 text-emerald-700 border border-emerald-100' : 'bg-amber-50 text-amber-700 border border-amber-100'
+                        className={`inline-flex items-center gap-1 rounded-full border px-2 py-1 ${
+                          product.inStock
+                            ? 'border-emerald-100 bg-emerald-50 text-emerald-700'
+                            : 'border-amber-100 bg-amber-50 text-amber-700'
                         }`}
                       >
                         <span className="h-2 w-2 rounded-full bg-current" />
                         {product.inStock ? 'In stock' : 'Out of stock'}
                       </span>
                     </div>
+                  </div>
 
+                  <div className="flex items-center justify-end min-w-[140px]">
                     <button
                       type="button"
                       disabled={!product.inStock}
-                      className={`ml-auto rounded-lg px-4 py-2 text-sm font-semibold transition ${
+                      className={`rounded-lg px-4 py-2 text-sm font-semibold transition ${
                         product.inStock
                           ? 'bg-cyan-600 text-white hover:bg-cyan-700'
                           : 'bg-slate-200 text-slate-500 cursor-not-allowed'
